@@ -1,69 +1,60 @@
 var fs = require('fs');
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     'use strict';
-        grunt.initConfig({
+
+    grunt.initConfig({
+        prop: 'some property',
+        pkg: grunt.file.readJSON('package.json'),
         running: {
-            taskOwner: 'me',
+            taskOwner: 'Dan',
             src: 'js/somefile.js',
-            dest: 'somefile.js'
+            dest: 'somefile.js',
+            options: {
+                comment: '/* <%= pkg.author %> */'
+            }
         },
-        multi:{
+        multi: {
             config1: {
-                message: "this is config 1",
+                message: 'This is config1',
                 files: {
-                    'someotherfile.js' : 'js/somefile.js'
+                    'someotherfile.js': 'js/somefile.js'
                 }
             },
-            config2:{
-                message: "this is config 2",
+            config2: {
+                message: 'This is config2',
                 files: [
                     {
-                    src: 'js/somefile.js',
-                    dest: 'someotherfile.js'
-                }
+                        src: 'js/somefile.js',
+                        dest: 'someotherfile.js'
+                    }
                 ]
-            },
+            }
         }
     });
-    grunt.registerTask('running', 'ein Beispiel Task',function(arg1){
-        var done = this.async();
+
+    grunt.registerTask('running', 'An example task', function (arg1) {
+        var done = this.async(),
+            //comment = this.options().comment;
+
         grunt.config.requires('running.taskOwner');
-        grunt.log.writeln('grunt running ...' + this.name, grunt.config.get('running.taskOwner'));
+        grunt.log.writeln('grunt running...' + this.name, grunt.config.get('running.taskOwner'));
         grunt.log.writeln(grunt.config.get('running.src'));
-        fs.readFile(grunt.config.get('running.src'), function(error, data){
-            fs.writeFile(grunt.config.get('running.dest'),data);
-             done();
-        });
-       
-    });
-    grunt.registerMultiTask('multi','ein beispiel multi task', function(){
-        grunt.log.writeln(this.data.message);
-        
-        this.files.forEach(function(file){
-            grunt.log.writeln(file.src[0] + ' ' + file.dest);
+
+        fs.readFile(grunt.config.get('running.src'), function (error, data) {
+            fs.writeFile(grunt.config.get('running.dest'), comment + '\n' + data);
+            fs.writeFile(grunt.config.get('running.dest'), + data);
+            done();
         });
     });
-    grunt.registerTask('run', 'run all the tasks',['running']);
 
-//  // Project configuration.
-//  grunt.initConfig({
-//    pkg: grunt.file.readJSON('package.json'),
-//    uglify: {
-//      options: {
-//        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-//      },
-//      build: {
-//        src: 'src/<%= pkg.name %>.js',
-//        dest: 'build/<%= pkg.name %>.min.js'
-//      }
-//    }
-//  });
+//    grunt.registerMultiTask('multi', 'An example multi task', function (arg1) {
+//        grunt.log.writeln(this.data.message, arg1);
 //
-//  // Load the plugin that provides the "uglify" task.
-//  grunt.loadNpmTasks('grunt-contrib-uglify');
-//
-//  // Default task(s).
-//  grunt.registerTask('default', ['uglify']);
+//        this.files.forEach(function (file) {
+//            grunt.log.writeln(file.src[0] + ' ' + file.dest);
+//        });
+//    });
 
-};
+    grunt.registerTask('run', 'Run all the tasks', ['running']);
+}
